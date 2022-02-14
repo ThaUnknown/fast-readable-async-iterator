@@ -5,6 +5,6 @@ ReadableStream.prototype[Symbol.asyncIterator] = async function* () {
   while (1) {
     const temp = last
     last = reader.read()
-    yield (await temp).value
+    yield (await temp).value || null
   }
 }
