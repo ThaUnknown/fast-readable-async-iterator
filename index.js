@@ -1,12 +1,23 @@
-// overwrite with custom
-if (typeof ReadableStream !== 'undefined') {
-  ReadableStream.prototype[Symbol.asyncIterator] = async function * () {
+if (typeof ReadableStream !== 'undefined' && !ReadableStream.prototype[Symbol.asyncIterator]) {
+  ReadableStream.prototype[Symbol.asyncIterator] = function () {
     const reader = this.getReader()
     let last = reader.read()
-    while (1) {
-      const temp = last
-      last = reader.read()
-      yield (await temp).value || null
+    return {
+      next () {
+        const temp = last
+        last = reader.read()
+        return temp
+      },
+      return () {
+        return reader.releaseLock()
+      },
+      throw (err) {
+        this.return()
+        throw err
+      },
+      [Symbol.asyncIterator] () {
+        return this
+      }
     }
   }
 }
