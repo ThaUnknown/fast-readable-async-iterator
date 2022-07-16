@@ -9,7 +9,7 @@ if (typeof ReadableStream !== 'undefined' && !ReadableStream.prototype[Symbol.as
         return temp
       },
       return () {
-        return reader.releaseLock()
+        last.then(() => reader.releaseLock())
       },
       throw (err) {
         this.return()
