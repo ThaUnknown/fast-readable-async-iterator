@@ -8,11 +8,13 @@ if (typeof ReadableStream !== 'undefined' && !ReadableStream.prototype[Symbol.as
         last = reader.read()
         return temp
       },
-      return () {
-        last.then(() => reader.releaseLock())
+      async return (value) {
+        await last
+        reader.releaseLock()
+        return { done: true, value }
       },
-      throw (err) {
-        this.return()
+      async throw (err) {
+        await this.return()
         throw err
       },
       [Symbol.asyncIterator] () {
